@@ -1,10 +1,7 @@
-from selenium.webdriver.common.keys import Keys
 from selenium import webdriver
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
-import keyboard
 from time import sleep
+import random
+import json
 
 
 class Driver:
@@ -13,29 +10,89 @@ class Driver:
     def access(self):
         Chrome=webdriver.Chrome("C:/Users/Manso/Documents/GitHub/MessagingBot/chromedriver")
         Chrome.get(self.website)
-        print("press q to exit")
         sleep(5)
-        FirstName=Chrome.find_element_by_css_selector("input[name='firstName']")
-        LastName=Chrome.find_element_by_css_selector("input[name='lastName']")
-        Email=Chrome.find_element_by_css_selector("input[name='Username']")
-        Password=Chrome.find_element_by_css_selector("input[name='Passwd']")
-        Confirm=Chrome.find_element_by_css_selector("input[name='ConfirmPasswd']")
+        # Generating credentials
+        credentials = Driver.generate_credentials()
+        # Fill isolated username field in iframe
+        form_frame = Chrome.find_element_by_css_selector("iframe")
+        Chrome.switch_to.frame(form_frame)
+        Username=Chrome.find_element_by_css_selector("input#username")
+        Username.send_keys(credentials["Email"])
+        Chrome.switch_to.default_content()
+        # Setup other fields
+        Password=Chrome.find_element_by_css_selector("input#password")
+        Confirm=Chrome.find_element_by_css_selector("input#repeat-password")
         sleep(2)
-        FirstName.send_keys("hamid")
-        LastName.send_keys("behraoui\t")
-        email="hamidbehraoui17"
-        Email.send_keys(email)
-        Password.send_keys("hliwa123")
-        Confirm.send_keys("hliwa123")
-
-        Create=Chrome.find_element_by_xpath("//button[@type='button']")
+        # Filling fields with credentials
+        Password.send_keys(credentials["Password"])
+        Confirm.send_keys(credentials["Password"])
+        # Add generated data to database
+        credentials["Email"] += "@protonmail.com"
+        Driver.database_edit(credentials)
+        # Confirm operation to next page
+        Create=Chrome.find_element_by_xpath("//button[@type='submit']")
         Create.click()
 
+        # Skip recovery options
+        sleep(3)
+        Skip=Chrome.find_element_by_css_selector("form[name='recoveryForm'] > button[type='button']")
+        Skip.click()
+
+        # Confirm skip from modal
+        sleep(3)
+        ConfirmSkip=Chrome.find_element_by_css_selector("form.modal-content > footer > button[type='button']")
+        ConfirmSkip.click()
+
+        # Select free plan (ofc)
+        sleep(3)
+        select_free_plan = Chrome.find_element_by_css_selector("button[aria-describedby='desc_Free'][type='button']")
+        select_free_plan.click()
         
-        sleep(50)
+        sleep(500)
+
+    def database_edit(new_creds):
+        db = open("DataBase.json", "r")
+        db_json = json.loads(db.read())
+        db.close()
+        db = open("DataBase.json", "w")
+        db_json.append(new_creds)
+        db.write(json.dumps(db_json))
+        db.close()
+
+    def generate_credentials():
+        creds = {
+            "Email": Driver.generator(),
+            "Password": Driver.generator()
+        }
+        return creds
+
+    def generator():
+        lettersCapetal="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        lettersLower=lettersCapetal.lower()
+        Numbers="0123456789"
+        holder=""
+        while len(holder) < 10:
+            holder+=random.choice(lettersCapetal+lettersLower+Numbers)
+        print(holder)
+        return holder
+
+    def generator_bis():
+        letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        data = [letters, letters.lower(), "0123456789"]
+        holder = ""
+        while len(holder) < 10:
+            index = random.randint(0,2)
+            holder += data[index][random.randint(0, len(data[index]) - 1)]
+        return holder
+
+
+     
+
 
 
 
 if __name__=="__main__":
-    Driver("https://accounts.google.com/signup/v2/webcreateaccount?service=mail&continue=https%3A%2F%2Fmail.google.com%2Fmail%2F&flowName=GlifWebSignIn&flowEntry=SignUp").access()
+    Driver("https://account.protonmail.com/signup?language=en").access()
+    
+
 
