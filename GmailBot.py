@@ -1,6 +1,7 @@
 from selenium import webdriver
 from time import sleep
 import random
+import pathlib
 import json
 
 
@@ -8,7 +9,9 @@ class Driver:
     def __init__(self,website):
         self.website=website
     def access(self):
-        Chrome=webdriver.Chrome("C:/Users/Manso/Documents/GitHub/MessagingBot/chromedriver")
+        options = webdriver.ChromeOptions()
+        options.add_argument("--log-level=3")
+        Chrome=webdriver.Chrome(str(pathlib.Path(__file__).parent.resolve()) + "\\chromedriver", options=options)
         Chrome.get(self.website)
         sleep(5)
         # Generating credentials
@@ -51,9 +54,12 @@ class Driver:
         sleep(500)
 
     def database_edit(new_creds):
-        db = open("DataBase.json", "r")
-        db_json = json.loads(db.read())
-        db.close()
+        try:
+            db = open("DataBase.json", "r")
+            db_json = json.loads(db.read())
+            db.close()
+        except FileNotFoundError or FileExistsError:
+            db_json = []
         db = open("DataBase.json", "w")
         db_json.append(new_creds)
         db.write(json.dumps(db_json))
@@ -85,14 +91,7 @@ class Driver:
             holder += data[index][random.randint(0, len(data[index]) - 1)]
         return holder
 
-
-     
-
-
-
-
 if __name__=="__main__":
     Driver("https://account.protonmail.com/signup?language=en").access()
     
-
 
