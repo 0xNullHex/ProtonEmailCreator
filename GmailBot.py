@@ -3,6 +3,7 @@ from time import sleep
 import random
 import pathlib
 import json
+import keyboard
 
 
 class Driver:
@@ -32,6 +33,8 @@ class Driver:
         # Add generated data to database
         credentials["Email"] += "@protonmail.com"
         Driver.database_edit(credentials)
+        # Print Email and Password on cmd
+        print("Email: {}\nPassword: {}".format(credentials["Email"], credentials["Password"]))
         # Confirm operation to next page
         Create=Chrome.find_element_by_xpath("//button[@type='submit']")
         Create.click()
@@ -50,8 +53,16 @@ class Driver:
         sleep(3)
         select_free_plan = Chrome.find_element_by_css_selector("button[aria-describedby='desc_Free'][type='button']")
         select_free_plan.click()
+        # Ask the user to enter the Captcha manually.
+        print("Am stuck Step-bro can you pass the capcha for me UwU.")
+
+        while True:
+            if keyboard.is_pressed('q'):
+                Driver.quit()
+            else:
+                pass
         
-        sleep(500)
+        
 
     def database_edit(new_creds):
         try:
@@ -79,7 +90,6 @@ class Driver:
         holder=""
         while len(holder) < 10:
             holder+=random.choice(lettersCapetal+lettersLower+Numbers)
-        print(holder)
         return holder
 
     def generator_bis():
