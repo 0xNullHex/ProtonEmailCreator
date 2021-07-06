@@ -3,16 +3,22 @@ from time import sleep
 import random
 import pathlib
 import json
-import keyboard
-
+import platform
 
 class Driver:
     def __init__(self,website):
         self.website=website
     def access(self):
         options = webdriver.ChromeOptions()
-        options.add_argument("--log-level=3")
-        Chrome=webdriver.Chrome(str(pathlib.Path(__file__).parent.resolve()) + "\\chromedriver", options=options)
+        options.add_argument("--log-level=3") # Make selenium silent
+        # Detach chrome instance from chrome driver
+        options.add_experimental_option("detach", True)
+        # Detect OS for correct path syntax
+        if platform.system() == "Windows":
+            driver_filename = "\\chromedriver"
+        else:
+            driver_filename = "/chromedriver"
+        Chrome=webdriver.Chrome(str(pathlib.Path(__file__).parent.resolve()) + driver_filename, options=options)
         Chrome.get(self.website)
         sleep(5)
         # Generating credentials
@@ -33,7 +39,7 @@ class Driver:
         # Add generated data to database
         credentials["Email"] += "@protonmail.com"
         Driver.database_edit(credentials)
-        # Print Email and Password on cmd
+        # Print Email and Password on terminal
         print("Email: {}\nPassword: {}".format(credentials["Email"], credentials["Password"]))
         # Confirm operation to next page
         Create=Chrome.find_element_by_xpath("//button[@type='submit']")
@@ -53,16 +59,9 @@ class Driver:
         sleep(3)
         select_free_plan = Chrome.find_element_by_css_selector("button[aria-describedby='desc_Free'][type='button']")
         select_free_plan.click()
-        # Ask the user to enter the Captcha manually.
-        print("Am stuck Step-bro can you pass the capcha for me UwU.")
-
-        while True:
-            if keyboard.is_pressed('q'):
-                Chrome.quit()
-            else:
-                pass
         
-        
+        # Ask the user to enter the Captcha manually
+        print("The script still does not bypass Captchas. You'll have to deal with them !")        
 
     def database_edit(new_creds):
         try:
