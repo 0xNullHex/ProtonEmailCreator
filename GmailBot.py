@@ -61,7 +61,8 @@ class Driver:
         select_free_plan.click()
         
         # Ask the user to enter the Captcha manually
-        print("The script still does not bypass Captchas. You'll have to deal with them !")        
+        print("Am stuck stepbro ! Can you pass the capcha for me UwU ?")
+
 
     def database_edit(new_creds):
         try:
