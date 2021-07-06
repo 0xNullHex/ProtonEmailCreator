@@ -58,7 +58,7 @@ class Driver:
 
         while True:
             if keyboard.is_pressed('q'):
-                Driver.quit()
+                Chrome.quit()
             else:
                 pass
         
