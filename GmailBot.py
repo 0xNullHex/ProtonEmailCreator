@@ -84,12 +84,10 @@ class Driver:
         return creds
 
     def generator():
-        lettersCapetal="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        lettersLower=lettersCapetal.lower()
-        Numbers="0123456789"
+        Characters ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
         holder=""
         while len(holder) < 10:
-            holder+=random.choice(lettersCapetal+lettersLower+Numbers)
+            holder+=random.choice(Characters)
         return holder
 
     def generator_bis():
