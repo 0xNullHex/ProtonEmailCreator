@@ -15,7 +15,7 @@ class Driver:
         options.add_experimental_option("detach", True)
         # Detect OS for correct path syntax
         if platform.system() == "Windows":
-            driver_filename = "\\chromedriver"
+            driver_filename = "\\chromedriver.exe"
         else:
             driver_filename = "/chromedriver"
         Chrome=webdriver.Chrome(str(pathlib.Path(__file__).parent.resolve()) + driver_filename, options=options)
